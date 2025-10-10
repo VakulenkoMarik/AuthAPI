@@ -40,18 +40,13 @@ namespace UI
         }
         
         public void Register() {
-            if (registrationPasswordField.text != registrationConfirmPasswordField.text) {
-                errorText.text = "Passwords do not match";
-                return;
-            }
-
             var request = new Dtos.RegisterRequest(
                 registrationUsernameField.text,
                 registrationPasswordField.text,
                 registrationConfirmPasswordField.text
             );
 
-            StartCoroutine(SendAuthRequest("http://localhost:5000/register", request, HandleRegisterResponse));
+            StartCoroutine(SendAuthRequest("http://localhost:5036/register", request, HandleRegisterResponse));
         }
 
         private void HandleRegisterResponse(Dtos.AuthResponse response) {
@@ -67,7 +62,7 @@ namespace UI
                 loginPasswordField.text
             );
 
-            StartCoroutine(SendAuthRequest("http://localhost:5000/login", request, HandleLoginResponse));
+            StartCoroutine(SendAuthRequest("http://localhost:5036/login", request, HandleLoginResponse));
         }
 
         private void HandleLoginResponse(Dtos.AuthResponse response) {
