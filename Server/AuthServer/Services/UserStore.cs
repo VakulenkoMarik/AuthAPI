@@ -8,15 +8,12 @@ namespace Server.Services
         {
             get
             {
-                string folder = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                string localLow = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                     "AuthServer"
                 );
-
-                if (!Directory.Exists(folder))
-                    Directory.CreateDirectory(folder);
-
-                return Path.Combine(folder, "users.json");
+                Directory.CreateDirectory(localLow);
+                return Path.Combine(localLow, "users.json");
             }
         }
 

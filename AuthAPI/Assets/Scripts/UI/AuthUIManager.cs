@@ -46,7 +46,7 @@ namespace UI
                 registrationConfirmPasswordField.text
             );
 
-            StartCoroutine(SendAuthRequest("http://localhost:5036/register", request, HandleRegisterResponse));
+            StartCoroutine(SendAuthRequest("http://localhost:5107/register", request, HandleRegisterResponse));
         }
 
         private void HandleRegisterResponse(Dtos.AuthResponse response) {
@@ -62,7 +62,7 @@ namespace UI
                 loginPasswordField.text
             );
 
-            StartCoroutine(SendAuthRequest("http://localhost:5036/login", request, HandleLoginResponse));
+            StartCoroutine(SendAuthRequest("http://localhost:5107/login", request, HandleLoginResponse));
         }
 
         private void HandleLoginResponse(Dtos.AuthResponse response) {

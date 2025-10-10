@@ -47,6 +47,10 @@ ExportedObj/
 *.unityproj
 *.sln
 *.suo
+
+!Server/AuthServer/*.csproj
+!Server/AuthServer/*.sln
+
 *.tmp
 *.user
 *.userprefs
