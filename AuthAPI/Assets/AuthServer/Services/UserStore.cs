@@ -27,7 +27,7 @@ namespace AuthServer.Services
             File.WriteAllText(FilePath, json);
         }
         
-        public static bool AddUser(string username, string password) {
+        public static bool TryAddUser(string username, string password) {
             if (!_users.TryAdd(username, password)) {
                 return false;
             }
