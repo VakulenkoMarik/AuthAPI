@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Server.Models;
-using Server.Services;
+using AuthServer.Models;
+using AuthServer.Services;
 
 namespace AuthServer.Controllers
 {
@@ -12,22 +12,35 @@ namespace AuthServer.Controllers
         public IActionResult Register([FromBody] Dtos.RegisterRequest request)
         {
             if (request.Password != request.ConfirmPassword)
-                return BadRequest(new Dtos.AuthResponse(false, "Passwords do not match"));
+                return BadRequest(new Dtos.AuthResponse(false, "Passwords do not match", new()));
 
             if (!UserStore.TryAddUser(request.Username, request.Password))
-                return BadRequest(new Dtos.AuthResponse(false, "User already exists"));
+                return BadRequest(new Dtos.AuthResponse(false, "User already exists", new()));
 
-            return Ok(new Dtos.AuthResponse(true, "Registration successful"));
+            var user = UserStore.ValidateUser(request.Username, request.Password);
+
+            return Ok(new Dtos.AuthResponse(true, "Registration successful", new UserData
+            {
+                Username = user.Username,
+                Password = user.Password,
+                Coins = user.Coins
+            }));
         }
 
         [HttpPost("login")]
         public IActionResult Login([FromBody] Dtos.LoginRequest request)
         {
-            bool isValid = UserStore.ValidateUser(request.Username, request.Password);
-            if (!isValid)
-                return BadRequest(new Dtos.AuthResponse(false, "Invalid username or password"));
+            var user = UserStore.ValidateUser(request.Username, request.Password);
+            if (user == null)
+                return Unauthorized(new Dtos.AuthResponse(false, "Invalid username or password", new UserData()));
 
-            return Ok(new Dtos.AuthResponse(true, "Login successful"));
+            var userData = new UserData
+            {
+                Username = user.Username,
+                Coins = user.Coins
+            };
+
+            return Ok(new Dtos.AuthResponse(true, "Login successful", userData));
         }
     }
 }

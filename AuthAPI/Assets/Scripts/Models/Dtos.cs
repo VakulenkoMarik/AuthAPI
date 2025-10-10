@@ -36,13 +36,15 @@ namespace Models
         {
             public bool Success { get; set; }
             public string Message { get; set; }
+            public UserData User { get; set; }
 
             public AuthResponse() { }
 
-            public AuthResponse(bool success, string message)
+            public AuthResponse(bool success, string message, UserData user)
             {
                 Success = success;
                 Message = message;
+                User = user;
             }
         }
     }

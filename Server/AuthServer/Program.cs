@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using Server.Services;
+using AuthServer.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

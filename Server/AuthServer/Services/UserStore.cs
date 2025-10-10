@@ -1,6 +1,7 @@
+using AuthServer.Models;
 using Newtonsoft.Json;
 
-namespace Server.Services
+namespace AuthServer.Services
 {
     public static class UserStore
     {
@@ -17,19 +18,18 @@ namespace Server.Services
             }
         }
 
-        private static Dictionary<string, string> _users = new();
+        private static List<UserData> _users = new();
 
         public static void Load()
         {
             if (File.Exists(FilePath))
             {
                 string json = File.ReadAllText(FilePath);
-                _users = JsonConvert.DeserializeObject<Dictionary<string, string>>(json)
-                         ?? new Dictionary<string, string>();
+                _users = JsonConvert.DeserializeObject<List<UserData>>(json) ?? new List<UserData>();
             }
             else
             {
-                _users = new Dictionary<string, string>();
+                _users = new List<UserData>();
             }
         }
 
@@ -41,16 +41,17 @@ namespace Server.Services
 
         public static bool TryAddUser(string username, string password)
         {
-            if (!_users.TryAdd(username, password))
+            if (_users.Any(u => u.Username == username))
                 return false;
 
+            _users.Add(new UserData { Username = username, Password = password });
             Save();
             return true;
         }
 
-        public static bool ValidateUser(string username, string password)
+        public static UserData? ValidateUser(string username, string password)
         {
-            return _users.TryGetValue(username, out string storedPassword) && storedPassword == password;
+            return _users.FirstOrDefault(u => u.Username == username && u.Password == password);
         }
     }
 }

@@ -1,4 +1,6 @@
-namespace Server.Models
+using AuthServer.Models;
+
+namespace AuthServer.Models
 {
     public class Dtos
     {
@@ -36,13 +38,15 @@ namespace Server.Models
         {
             public bool Success { get; set; }
             public string Message { get; set; }
+            public UserData User { get; set; }
 
             public AuthResponse() { }
 
-            public AuthResponse(bool success, string message)
+            public AuthResponse(bool success, string message, UserData user)
             {
                 Success = success;
                 Message = message;
+                User = user;
             }
         }
     }

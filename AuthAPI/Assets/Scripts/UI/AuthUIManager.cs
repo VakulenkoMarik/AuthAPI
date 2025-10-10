@@ -1,4 +1,5 @@
 using System.Collections;
+using Data;
 using Models;
 using Newtonsoft.Json;
 using TMPro;
@@ -35,7 +36,7 @@ namespace UI
                 callback?.Invoke(response);
             }
             else {
-                callback?.Invoke(new Dtos.AuthResponse(false, "Server error"));
+                callback?.Invoke(new Dtos.AuthResponse(false, "Server error", new UserData()));
             }
         }
         
@@ -46,14 +47,7 @@ namespace UI
                 registrationConfirmPasswordField.text
             );
 
-            StartCoroutine(SendAuthRequest("http://localhost:5107/register", request, HandleRegisterResponse));
-        }
-
-        private void HandleRegisterResponse(Dtos.AuthResponse response) {
-            if (response.Success)
-                SceneManager.LoadScene("DemoMenu");
-            else
-                errorText.text = response.Message;
+            StartCoroutine(SendAuthRequest("http://localhost:5107/register", request, HandleResponse));
         }
         
         public void Login() {
@@ -62,14 +56,20 @@ namespace UI
                 loginPasswordField.text
             );
 
-            StartCoroutine(SendAuthRequest("http://localhost:5107/login", request, HandleLoginResponse));
+            StartCoroutine(SendAuthRequest("http://localhost:5107/login", request, HandleResponse));
         }
 
-        private void HandleLoginResponse(Dtos.AuthResponse response) {
-            if (response.Success)
+        private void HandleResponse(Dtos.AuthResponse response) { 
+            if (response.Success) {
                 SceneManager.LoadScene("DemoMenu");
-            else
+                References.SetCurrentUser(response.User);
+                
+                Debug.Log(References.GetCurrentUser().Username);
+                Debug.Log(References.GetCurrentUser().Coins);
+            }
+            else {
                 errorText.text = response.Message;
+            }
         }
     }
 }
