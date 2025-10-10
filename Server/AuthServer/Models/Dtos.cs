@@ -1,4 +1,4 @@
-namespace AuthServer.Models
+namespace Server.Models
 {
     public class Dtos
     {
@@ -6,13 +6,15 @@ namespace AuthServer.Models
         {
             public string Username { get; set; }
             public string Password { get; set; }
+            public string ConfirmPassword { get; set; }
 
             public RegisterRequest() { }
 
-            public RegisterRequest(string username, string password)
+            public RegisterRequest(string username, string password, string confirmPassword)
             {
                 Username = username;
                 Password = password;
+                ConfirmPassword = confirmPassword;
             }
         }
 

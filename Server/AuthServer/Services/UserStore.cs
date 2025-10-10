@@ -1,13 +1,10 @@
-using System.Collections.Generic;
-using System.IO;
 using Newtonsoft.Json;
-using UnityEngine;
 
-namespace AuthServer.Services
+namespace Server.Services
 {
     public static class UserStore
     {
-        private static string FilePath => Path.Combine(Application.persistentDataPath, "users.json");
+        private static string FilePath => Path.Combine(Directory.GetCurrentDirectory(), "users.json");
 
         private static Dictionary<string, string> _users = new();
         

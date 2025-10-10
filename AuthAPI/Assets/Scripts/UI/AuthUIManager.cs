@@ -1,6 +1,9 @@
-using AuthServer.Services;
+using System.Collections;
+using Models;
+using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
 namespace UI
@@ -16,36 +19,62 @@ namespace UI
 
         [SerializeField] private TextMeshProUGUI errorText;
         
-        private void Awake() {
-            UserStore.Load();
+        private IEnumerator SendAuthRequest<T>(string url, T requestData, System.Action<Dtos.AuthResponse> callback) {
+            string json = JsonConvert.SerializeObject(requestData);
+
+            using UnityWebRequest www = new UnityWebRequest(url, "POST");
+            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
+            www.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Content-Type", "application/json");
+
+            yield return www.SendWebRequest();
+
+            if (www.result == UnityWebRequest.Result.Success) {
+                var response = JsonConvert.DeserializeObject<Dtos.AuthResponse>(www.downloadHandler.text);
+                callback?.Invoke(response);
+            }
+            else {
+                callback?.Invoke(new Dtos.AuthResponse(false, "Server error"));
+            }
         }
-            
+        
         public void Register() {
-            if (TryCreateNewUser()) {
+            if (registrationPasswordField.text != registrationConfirmPasswordField.text) {
+                errorText.text = "Passwords do not match";
+                return;
+            }
+
+            var request = new Dtos.RegisterRequest(
+                registrationUsernameField.text,
+                registrationPasswordField.text,
+                registrationConfirmPasswordField.text
+            );
+
+            StartCoroutine(SendAuthRequest("http://localhost:5000/register", request, HandleRegisterResponse));
+        }
+
+        private void HandleRegisterResponse(Dtos.AuthResponse response) {
+            if (response.Success)
                 SceneManager.LoadScene("DemoMenu");
-            } else {
-                errorText.text = "registration error";
-            }
+            else
+                errorText.text = response.Message;
         }
-
-        private bool TryCreateNewUser() {
-            bool isPasswordTheSame = registrationPasswordField.text.Equals(registrationConfirmPasswordField.text);
-
-            if (isPasswordTheSame) {
-                return UserStore.TryAddUser(registrationUsernameField.text, registrationPasswordField.text);
-            }
-
-            return false;
-        }
-
+        
         public void Login() {
-            bool isCorrectUserPasswordPair = UserStore.ValidateUser(loginUsernameField.text, loginPasswordField.text);
-            
-            if (isCorrectUserPasswordPair) {
+            var request = new Dtos.LoginRequest(
+                loginUsernameField.text,
+                loginPasswordField.text
+            );
+
+            StartCoroutine(SendAuthRequest("http://localhost:5000/login", request, HandleLoginResponse));
+        }
+
+        private void HandleLoginResponse(Dtos.AuthResponse response) {
+            if (response.Success)
                 SceneManager.LoadScene("DemoMenu");
-            } else {
-                errorText.text = "login error";
-            }
+            else
+                errorText.text = response.Message;
         }
     }
 }
