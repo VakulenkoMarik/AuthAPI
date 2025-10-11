@@ -42,5 +42,17 @@ namespace AuthServer.Controllers
 
             return Ok(new Dtos.AuthResponse(true, "Login successful", userData));
         }
+
+        [HttpPost("updateCoins")]
+        public IActionResult UpdateCoins([FromBody] Dtos.UpdateCoinsRequest request)
+        {
+            var user = UserStore.ValidateUserByName(request.Username);
+            if (user == null)
+                return NotFound(new { Message = "User not found" });
+
+            user.Coins = request.Coins;
+            UserStore.Save();
+            return Ok(new { Success = true, Message = "Coins updated", Coins = user.Coins });
+        }
     }
 }

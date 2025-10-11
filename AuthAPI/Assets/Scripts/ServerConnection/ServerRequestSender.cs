@@ -14,7 +14,14 @@ namespace ServerConnection
         public static ServerRequestSender Instance;
 
         private void Awake() {
+            if (Instance != null) {
+                Destroy(gameObject);
+                return;
+            }
+            
             Instance = this;
+            
+            DontDestroyOnLoad(gameObject);
         }
         
         public void SendRegisterRequest(string username, string password, string confirmPassword, Action<Dtos.AuthResponse> handleResponse) {
@@ -27,6 +34,12 @@ namespace ServerConnection
             var request = new Dtos.LoginRequest(username, password);
 
             StartCoroutine(SendAuthRequest("/login", request, handleResponse));
+        }
+        
+        public void SendUpdateCoinsRequest(string username, int coins, Action<Dtos.AuthResponse> handleResponse) {
+            var request = new Dtos.UpdateCoinsRequest(username, coins);
+
+            StartCoroutine(SendAuthRequest("/updateCoins", request, handleResponse));
         }
 
         private IEnumerator SendAuthRequest<T>(string command, T requestData, Action<Dtos.AuthResponse> callback) {

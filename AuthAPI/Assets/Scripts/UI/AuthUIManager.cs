@@ -1,3 +1,4 @@
+using System;
 using Data;
 using Models;
 using ServerConnection;
@@ -20,7 +21,7 @@ namespace UI
 
         private ServerRequestSender _serverRequestSender;
 
-        private void Awake() {
+        private void Start() {
             _serverRequestSender = ServerRequestSender.Instance;
         }
 

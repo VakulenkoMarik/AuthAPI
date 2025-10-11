@@ -53,5 +53,10 @@ namespace AuthServer.Services
         {
             return _users.FirstOrDefault(u => u.Username == username && u.Password == password);
         }
+
+        public static UserData? ValidateUserByName(string username)
+        {
+            return _users.FirstOrDefault(u => u.Username == username);
+        }
     }
 }

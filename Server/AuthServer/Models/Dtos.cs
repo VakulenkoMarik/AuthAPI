@@ -49,5 +49,18 @@ namespace AuthServer.Models
                 User = user;
             }
         }
+
+        public class UpdateCoinsRequest
+        {
+            public string Username { get; set; }
+            public int Coins { get; set; }
+            
+            public UpdateCoinsRequest() {}
+
+            public UpdateCoinsRequest(string username, int coins) {
+                Username = username;
+                Coins = coins;
+            }
+        }
     }
 }
