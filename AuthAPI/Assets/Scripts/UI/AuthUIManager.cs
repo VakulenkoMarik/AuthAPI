@@ -63,9 +63,6 @@ namespace UI
             if (response.Success) {
                 SceneManager.LoadScene("DemoMenu");
                 References.SetCurrentUser(response.User);
-                
-                Debug.Log(References.GetCurrentUser().Username);
-                Debug.Log(References.GetCurrentUser().Coins);
             }
             else {
                 errorText.text = response.Message;
