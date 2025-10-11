@@ -1,10 +1,8 @@
-using System.Collections;
 using Data;
 using Models;
-using Newtonsoft.Json;
+using ServerConnection;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
 namespace UI
@@ -19,44 +17,26 @@ namespace UI
         [SerializeField] private TMP_InputField registrationConfirmPasswordField;
 
         [SerializeField] private TextMeshProUGUI errorText;
-        
-        private IEnumerator SendAuthRequest<T>(string url, T requestData, System.Action<Dtos.AuthResponse> callback) {
-            string json = JsonConvert.SerializeObject(requestData);
 
-            using UnityWebRequest www = new UnityWebRequest(url, "POST");
-            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
-            www.uploadHandler = new UploadHandlerRaw(bodyRaw);
-            www.downloadHandler = new DownloadHandlerBuffer();
-            www.SetRequestHeader("Content-Type", "application/json");
+        private ServerRequestSender _serverRequestSender;
 
-            yield return www.SendWebRequest();
-
-            if (www.result == UnityWebRequest.Result.Success) {
-                var response = JsonConvert.DeserializeObject<Dtos.AuthResponse>(www.downloadHandler.text);
-                callback?.Invoke(response);
-            }
-            else {
-                callback?.Invoke(new Dtos.AuthResponse(false, "Server error", new UserData()));
-            }
+        private void Awake() {
+            _serverRequestSender = ServerRequestSender.Instance;
         }
-        
-        public void Register() {
-            var request = new Dtos.RegisterRequest(
-                registrationUsernameField.text,
-                registrationPasswordField.text,
-                registrationConfirmPasswordField.text
-            );
 
-            StartCoroutine(SendAuthRequest("http://localhost:5107/register", request, HandleResponse));
+        public void Register() {
+            string username = registrationUsernameField.text;
+            string password = registrationPasswordField.text;
+            string confirmPassword = registrationConfirmPasswordField.text;
+            
+            _serverRequestSender.SendRegisterRequest(username, password, confirmPassword, HandleResponse);
         }
         
         public void Login() {
-            var request = new Dtos.LoginRequest(
-                loginUsernameField.text,
-                loginPasswordField.text
-            );
-
-            StartCoroutine(SendAuthRequest("http://localhost:5107/login", request, HandleResponse));
+            string username = loginUsernameField.text;
+            string password = loginPasswordField.text;
+            
+            _serverRequestSender.SendLoginRequest(username, password, HandleResponse);
         }
 
         private void HandleResponse(Dtos.AuthResponse response) { 
@@ -65,7 +45,7 @@ namespace UI
                 References.SetCurrentUser(response.User);
             }
             else {
-                errorText.text = response.Message;
+                errorText.SetText(response.Message);
             }
         }
     }
